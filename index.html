@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>记账器</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+    <style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+			text-align: left;
+		}
+    </style>
+    <script>
+        var playerCount = 1;
+		function addRow() {
+			var inputText = document.getElementById("input-id").value;
+			var table = document.getElementById("table-id");
+			var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
+			var playerCell = row.insertCell(0);
+			var scoreCell = row.insertCell(1);
+			var actionCell = row.insertCell(2);
+            var cancelCell = row.insertCell(3);
+            var cashoutCell = row.insertCell(4);          
+			playerCell.innerHTML = inputText;
+			scoreCell.innerHTML = -10000;
+			actionCell.innerHTML = '<button onclick="reduceScore(this)">Pay 10000</button>';
+            cancelCell.innerHTML = '<button onclick="increaseScore(this)">Cancel</button>';
+            cashoutCell.innerHTML = '<input type="number" name="input-name" value="" placeholder="Enter value">';
+          
+		}
+		
+        
+        function resetTable() {
+			var table = document.getElementById("table-id"); 
+			var rowCount = table.rows.length;
+			for (var i = rowCount - 1; i > 0; i--) { 
+				table.deleteRow(i);
+			}
+			document.getElementById("input-id").value = "";
+		}
+        
+        function reduceScore(button) {
+			var row = button.parentNode.parentNode;
+			var scoreCell = row.cells[1];
+			var newScore = parseInt(scoreCell.innerHTML) - 10000;
+			scoreCell.innerHTML = newScore;
+			var playerName = row.cells[0].innerHTML;
+			var actionText = playerName + "支付了10000";
+			document.getElementById("action-text").innerHTML = actionText;
+            logAction(actionText); 
+		}
+        
+        function increaseScore(button) {
+			var row = button.parentNode.parentNode;
+			var scoreCell = row.cells[1];
+			var newScore = parseInt(scoreCell.innerHTML) + 10000;
+			scoreCell.innerHTML = newScore;
+			var playerName = row.cells[0].innerHTML;
+			var actionText = playerName + "撤回了支付";
+			document.getElementById("action-text").innerHTML = actionText;
+            logAction(actionText); 
+		}        
+        
+        function logAction(text) {
+		var log = document.getElementById("log");
+		var li = document.createElement("li");
+		var date = new Date();
+		var timestamp = date.toLocaleString();
+		li.appendChild(document.createTextNode(timestamp + " - " + text));
+		log.appendChild(li);
+	}
+         function addTotalColumn() {
+    var table = document.getElementById("table-id");
+    var rowCount = table.rows.length;
+    var totalHeader = table.rows[0].insertCell(2);
+    totalHeader.innerHTML = "Total";
+    for (var i = 1; i < rowCount; i++) {
+        var row = table.rows[i];
+        var scoreCell = row.cells[1];
+        var cashoutCell = row.cells[4]; // add cashoutCell variable
+        var totalCell = row.insertCell(2);
+        var total = parseInt(scoreCell.innerHTML) + parseInt(cashoutCell.firstChild.value); // include value of cashoutCell
+        if (!isNaN(total)) {
+            totalCell.innerHTML = total;
+        } else {
+            totalCell.innerHTML = "NaN";
+        }
+    }
+}
+	</script>
+</head>
+<body>
+	<header>
+		<h1>戒</h1>
+		<nav>
+			<ul>
+				<li><a href="#">Admin</a></li>
+				<li><a href="hall_of_shame">Hall of Shame</a></li>
+                <li><a href="checkout">Checkout</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<section>
+			<h2>Join the game</h2>
+			<p>Please enter your name</p>
+            <input type="text" name="input-name" id="input-id" placeholder="Please input your name">
+            <button onclick="addRow()">Join</button>
+            <button onclick="resetTable()">Reset</button>
+            <button onclick="addTotalColumn()">Total</button>
+		</section>
+		<section>
+			<h2>Current Game</h2>
+			<table id="table-id">
+				<tr>
+					<th>Player</th>
+					<th>Score</th>
+					<th>Action</th>
+                    <th>Cancel</th>
+                    <th>Cashout</th>
+				</tr>
+			</table>
+			<p id="action-text"></p>
+            <h3>Log</h3>
+			<ul id="log"></ul>
+            <button onclick="resetTable()">Reset</button>
+		</section>
+	</main>
+	<footer>
+		<p>版权所有 © 2023 你的网页名称</p>
