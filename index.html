@@ -16,6 +16,43 @@
 		}
     </style>
     <script>
+        
+        function loadDataFromStorage() {
+    var data = JSON.parse(localStorage.getItem('gameData'));
+    if (data) {
+        var table = document.getElementById("table-id");
+        for (var i = 0; i < data.length; i++) {
+            var row = table.insertRow(i + 1);
+            var playerCell = row.insertCell(0);
+            var scoreCell = row.insertCell(1);
+            var actionCell = row.insertCell(2);
+            var cancelCell = row.insertCell(3);
+            var cashoutCell = row.insertCell(4); 
+            playerCell.innerHTML = data[i].player;
+            scoreCell.innerHTML = data[i].score;
+            actionCell.innerHTML = '<button onclick="reduceScore(this)">Pay 10000</button>';
+            cancelCell.innerHTML = '<button onclick="increaseScore(this)">Cancel</button>';
+            cashoutCell.innerHTML = '<input type="number" name="input-name" value="' + data[i].cashout + '" placeholder="Enter value">';
+        }
+    }
+}        
+        function saveDataToStorage() {
+    var table = document.getElementById("table-id");
+    var rowCount = table.rows.length;
+    var data = [];
+    for (var i = 1; i < rowCount; i++) {
+        var row = table.rows[i];
+        var playerCell = row.cells[0];
+        var scoreCell = row.cells[1];
+        var cashoutCell = row.cells[4];
+        data.push({
+            player: playerCell.innerHTML,
+            score: scoreCell.innerHTML,
+            cashout: cashoutCell.firstChild.value
+        });
+    }
+    localStorage.setItem('gameData', JSON.stringify(data));
+}
         var playerCount = 1;
 		function addRow() {
 			var inputText = document.getElementById("input-id").value;
@@ -32,7 +69,7 @@
 			actionCell.innerHTML = '<button onclick="reduceScore(this)">Pay 10000</button>';
             cancelCell.innerHTML = '<button onclick="increaseScore(this)">Cancel</button>';
             cashoutCell.innerHTML = '<input type="number" name="input-name" value="" placeholder="Enter value">';
-          
+            saveDataToStorage();    
 		}
 		
         
@@ -43,6 +80,7 @@
 				table.deleteRow(i);
 			}
 			document.getElementById("input-id").value = "";
+            saveDataToStorage();
 		}
         
         function reduceScore(button) {
@@ -54,6 +92,7 @@
 			var actionText = playerName + "支付了10000";
 			document.getElementById("action-text").innerHTML = actionText;
             logAction(actionText); 
+            saveDataToStorage();
 		}
         
         function increaseScore(button) {
@@ -65,6 +104,7 @@
 			var actionText = playerName + "撤回了支付";
 			document.getElementById("action-text").innerHTML = actionText;
             logAction(actionText); 
+            saveDataToStorage();
 		}        
         
         function logAction(text) {
@@ -90,12 +130,15 @@
             totalCell.innerHTML = total;
         } else {
             totalCell.innerHTML = "NaN";
+            
         }
     }
+             saveDataToStorage();
 }
+
 	</script>
 </head>
-<body>
+<body onload="loadDataFromStorage()">
 	<header>
 		<h1>戒</h1>
 		<nav>
@@ -112,7 +155,6 @@
 			<p>Please enter your name</p>
             <input type="text" name="input-name" id="input-id" placeholder="Please input your name">
             <button onclick="addRow()">Join</button>
-            <button onclick="resetTable()">Reset</button>
             <button onclick="addTotalColumn()">Total</button>
 		</section>
 		<section>
@@ -132,4 +174,5 @@
             <button onclick="resetTable()">Reset</button>
 		</section>
 	</main>
-	</html>
+	<footer>
+		<p>版权所有Freedom © 2023 你的网页名称</p>
